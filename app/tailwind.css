@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,8 +6,21 @@
 html,
 body {
   @apply bg-white dark:bg-gray-950;
+  
 
   @media (prefers-color-scheme: dark) {
     color-scheme: dark;
+  }
+  
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    /* すべてのスクロールバーを非表示 */
+    -ms-overflow-style: none; /* Internet Explorer用 */
+    scrollbar-width: none; /* Firefox用 */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge用 */
   }
 }

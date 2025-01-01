@@ -5,6 +5,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import '@splidejs/splide/css/core';
 import type { LinksFunction } from "@remix-run/node";
 
 import "./tailwind.css";
@@ -31,7 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="font-Noto text-[#FF0054]">
         {children}
         <ScrollRestoration />
         <Scripts />
