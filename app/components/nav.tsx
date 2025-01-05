@@ -1,5 +1,7 @@
 import { SetState } from "../types/type";
 import { Link } from "@remix-run/react";
+import { debounce } from '~/hooks/functions';
+import { useState,useEffect } from "react";
 
 type props = {
     home?:boolean
@@ -19,10 +21,29 @@ export default function Nav({home,search,auction,directMessage,itemForm,auctionP
     const onChangebidPrice = (e: React.ChangeEvent<HTMLInputElement>) => {
         setState && setState(e.target.value);
     };
+    let prevY = 0;
+    const [hidden, setHidden] = useState<boolean>(true);
+    const [isOKEventListener, setIsOKEventListener] = useState<boolean>(false);
+
+        
+        //デバウンス関数を試験的に実装。めちゃいい感じ
+        const handleScroll = debounce(() => {
+            const currentY = window.scrollY;
+    
+            // 上にスクロールしている場合
+            if (currentY < prevY) { 
+              setHidden(true); 
+            } else { 
+            // 下にスクロールしている場合
+              if (currentY > 0) {
+                setHidden(false);
+              }
+            }
+            prevY = currentY;
+          }, 25); // 50ミリ秒のデバウンス
 
     const onKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            console.log("Enter");
 
               const response = await fetch("http://localhost:1234/api/v1/production/bid",{ 
                   method: 'POST', 
@@ -36,15 +57,21 @@ export default function Nav({home,search,auction,directMessage,itemForm,auctionP
                     }),
                 });
               const data = await response.json();
-              console.log(data)
           
               return data;
             
         }
       };
+          useEffect(() => {
+              if(!isOKEventListener){
+                  setIsOKEventListener(true);
+                  window.addEventListener('scroll', handleScroll);
+              }
+          },[prevY]);
 
   return (
-    <div className={`fixed lg:w-[375px] w-full flex flex-col items-center gap-0 bottom-0 pr-3 pl-3 ${auctionParticipationStatus && "z-[9999]"}`}>
+    //bottomはスクロールしていない時は0px
+    <div onClick={() => {setHidden(!hidden)}} className={`fixed lg:w-[375px] w-full flex flex-col items-center gap-0 ${hidden ? "bottom-[-72px]" : "bottom-0"} transition-all pr-3 pl-3 z-50 ${auctionParticipationStatus && "z-[9999]"}`}>
         <ul className="w-full h-fit flex flex-col gap-0 relative">
                 <li className="w-full bottom-0 z-40 absolute h-fit">
                     <svg className="full" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"  viewBox="0 0 351 60">

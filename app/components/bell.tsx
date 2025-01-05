@@ -152,8 +152,8 @@ export default function bell({notificationsCount}: props) {
                 </ul>
             </div>
         </div>
-        <div className="z-50 w-full pr-[40px] absolute top-[100px] ">
-            <svg onClick={() => {setButtomState(1)}} className="float-right" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
+        <div className="z-50 w-full pr-[40px] absolute top-[100px] pointer-events-none">
+            <svg onClick={() => {setButtomState(1)}} className="float-right pointer-events-auto" xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 56 56">
                 <g id="グループ_19" data-name="グループ 19" transform="translate(0 0.261)">
                     <g id="長方形_3" data-name="長方形 3" transform="translate(0 -0.261)" fill="#ff0054" stroke="#fff" stroke-width="1">
                         <rect width="56" height="56" rx="28" stroke="none"/>

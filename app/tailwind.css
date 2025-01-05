@@ -16,11 +16,92 @@ body {
 
 @layer utilities {
   .scrollbar-hide {
-    /* すべてのスクロールバーを非表示 */
     -ms-overflow-style: none; /* Internet Explorer用 */
     scrollbar-width: none; /* Firefox用 */
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge用 */
   }
+  .clip-custom {
+    clip-path: polygon(0 0, 100% 10%, 90% 100%, 0% 90%);
+  }
+  textarea {
+    field-sizing: content;
+  }
+  .fill-change {
+    animation: fill-change 0.75s;
+  }
+  .popin-selectBox {
+    animation: popup 0.2s cubic-bezier(1, 1, 1, 1) forwards;
+  }
+  .fade-out {
+    animation: fadeOut 0.1s ease-out;
+  }
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  .slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  .slide-out {
+    animation: slideOut 0.3s ease-out;
+  }
+  @keyframes slideOut {
+    0% {
+      transform: translateX(0%) translateY(-50%);
+    }
+    100% {
+      transform: translateX(100%) translateY(-50%);
+    }
+  }
+  @keyframes slideIn {
+    0% {
+      transform: translateX(100%) translateY(-50%);
+    }
+    100% {
+      transform: translateX(0%) translateY(-50%);
+
+    }
+  }
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  } 
+  @keyframes fadeOut {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+   
+  @keyframes popup {
+    0% {
+      transform: translateY(0px) scale(0);
+      opacity: 0;
+    }
+    80% {
+      transform: translateY(0px) scale(1.1);
+    } 
+    100% {
+      transform: translateY(0) scale(1.0);
+    }
+    80%, 100% {
+      opacity: 1;
+    }
+  }
+
+@keyframes fill-change {
+  0%, 100% {
+    fill: #ff0054;
+  }
+  0% {
+    fill: #ffffff;
+  }
+}
 }

@@ -1,12 +1,48 @@
+import { useEffect,useState } from 'react';
+import { debounce } from '~/hooks/functions';
 import Bell from './bell';
 type props = {
 
 }
 
 export default function Header({}: props) {
+
+    let prevY = 0;
+    const [isOKEventListener, setIsOKEventListener] = useState<boolean>(false);
+    const [hidden, setHidden] = useState<boolean>(true);
+    
+    //デバウンス関数を試験的に実装。めちゃいい感じ
+    const handleScroll = debounce(() => {
+        const currentY = window.scrollY;
+
+        // 上にスクロールしている場合
+        if (currentY < 100) { 
+          setHidden(false); 
+        } else { 
+        // 下にスクロールしている場合
+          if (currentY > 0) {
+            setHidden(true);
+          }
+        }
+        prevY = currentY;
+      }, 25); 
+    
+
+    useEffect(() => {
+        if(!isOKEventListener){
+            setIsOKEventListener(true);
+            window.addEventListener('scroll', handleScroll);
+        }
+          // クリーンアップ関数を追加
+        //   return () => {
+        //     window.removeEventListener('scroll', handleScroll);
+        //   };
+    },[prevY]);
+    
+
   return (
-    <header className="fixed lg:w-[375px] top-0 w-full z-40 pr-3 pl-3">
-        <ul className="top-0 w-full flex flex-col">
+    <header className={`fixed lg:w-[375px] ${hidden ? "top-[-50px]" : "top-0"} transition-all  w-full z-40 pr-3 pl-3`}>
+        <ul onClick={() => {setHidden(!hidden)}} className="top-0 w-full flex flex-col">
             <li className="absolute float-left top-0 z-40">
                 <svg className="" xmlns="http://www.w3.org/2000/svg" width="275.25" height="150.602" viewBox="0 0 275.25 150.602">
                     <path id="パス_9" data-name="パス 9" d="M2704.5-1020.082s47.1-64.791,162.836-83.5,112.4-67.1,112.4-67.1H2704.5Z" transform="translate(-2704.498 1170.683)" fill="#ff0054"/>

@@ -4,7 +4,7 @@ import Header from "../components/header";
 import Nav from "../components/nav";
 import Tag  from "~/components/tag";
 import { formatNumberWithCommas } from "~/hooks/functions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { products } from "../types/type";
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -31,6 +31,23 @@ export default function ProductPage() {
   const [bidState,setBidState] = useState<string>("");
 
   const product:products = useLoaderData<typeof loader>();
+  useEffect(() => {
+
+  if (typeof window !== 'undefined') {
+    const productsHistoryList:string|null = localStorage.getItem("productsHistory");
+    if(productsHistoryList){
+      const productsHistory:string[][] = JSON.parse(productsHistoryList);
+      productsHistory.unshift([`/items/${String(product.product_id)}`,product.product_image_url],);
+      localStorage.setItem("productsHistory",JSON.stringify(productsHistory));
+    }
+    else{
+      const productsHistory:string[][] = [[String(product.product_id),product.product_image_url],];
+      localStorage.setItem("productsHistory",JSON.stringify(productsHistory));
+    }
+  }
+},[]);
+  
+
   const bid = ["aaa","bbb"];
   const unsold = true;
   return (

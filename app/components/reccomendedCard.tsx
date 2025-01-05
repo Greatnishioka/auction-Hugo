@@ -10,7 +10,6 @@ type props = {
 }
 
 export default function reccomendedCard({title,tag,bid,progress,price}: props) {
-
   return (
     <article className="flex h-[248px] bg-[#FF0054] rounded-lg overflow-hidden">
         <div className="w-16 h-full overflow-hidden">

@@ -5,9 +5,9 @@ type props = {
 
 export default function BrowsingHistory({pages}: props) {
   return (
-    <div className="w-full p-2 flex flex-col gap-1 rounded-lg border border-[#FF0054] overflow-hidden">
+    <div className="w-full p-2 flex flex-col gap-1 rounded-lg border border-[#FF0054]  overflow-hidden">
         <p className="font-Noto text-xs font-bold ">閲覧履歴</p>
-        <ul className="flex gap-2">
+        <ul className="flex gap-2 overflow-x-auto scroll-snap-x scrollbar-hide">
         {pages.map((page, index) => {
               return (
                 <li className="w-fit h-fit">

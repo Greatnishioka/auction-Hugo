@@ -1,34 +1,34 @@
 import { useLoaderData } from "@remix-run/react";
-import {Link} from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import Header from "../components/header";
 import Nav from "../components/nav";
 import IconSvg from "../components/svgParts/importForm"
-import Tag  from "~/components/tag";
-import { formatNumberWithCommas } from "~/hooks/functions";
-import { useState } from "react";
+import Caution from "~/components/caution";
+import { useState,useEffect } from "react";
 import { products } from "../types/type";
 
-//export const loader: LoaderFunction = async ({ params }) => {
-//   const { itemNumber } = params;
+export const loader: LoaderFunction = async ({ params }) => {
+  const { itemNumber } = params;
 
-//   const response = await fetch("http://localhost:1234/api/v1/production/getDetail",{ 
-//     method: 'POST', 
-//     headers: {
-//       'Content-Type': 'application/json',  
-//     },
-//     body: JSON.stringify(
-//       {
-//         product_id:Number(itemNumber)
-//       }
-//     )
-//   });
-//   const data = await response.json();
+  const response = await fetch("http://localhost:1234/api/v1/production/getDetail",{ 
+    method: 'POST', 
+    headers: {
+      'Content-Type': 'application/json',  
+    },
+    body: JSON.stringify(
+      {
+        product_id:Number(itemNumber)
+      }
+    )
+  });
+  const data = await response.json();
 
-//   return data;
-//};
+  return data;
+};
 
 export default function ItemForm() {
+    const product:products = useLoaderData<typeof loader>();
+
   return (
     <div className="w-full flex justify-center items-center">
         <div className="lg:w-[375px] w-full h-full bg-[#FFF8EE] border-r-[1px] border-l-[1px] border-[#000]">
@@ -37,6 +37,7 @@ export default function ItemForm() {
             <section className="">
               <div className="flex justify-center pb-2 border-b-[1px] border-[#FF0054]">
                   <h1 className="font-bold text-xs">(生)林檎博'24－景気の回復－チケット(S席)</h1>
+                  {product.product_id}
               </div>
             </section>
             <section className="">
@@ -62,16 +63,7 @@ export default function ItemForm() {
                     <p className="font-medium text-[8px]">商品発送のため</p>
                   </li>
                 </ul>
-                <div className="flex gap-3 bg-[#FF0054] p-3 rounded">
-                  <span className="w-7 h-7 flex justify-center items-center">
-                    <svg className="w-full h-full" id="exclamation-circle-fill" xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29">
-                      <g id="グループ_183" data-name="グループ 183" transform="translate(0 0)">
-                        <path id="パス_185" data-name="パス 185" d="M29,14.5A14.5,14.5,0,1,1,14.5,0,14.5,14.5,0,0,1,29,14.5ZM14.5,7.25a1.64,1.64,0,0,0-1.631,1.8L13.5,15.41a1,1,0,0,0,1.994,0l.634-6.356A1.64,1.64,0,0,0,14.5,7.25Zm0,10.875a1.813,1.813,0,1,0,1.813,1.813A1.813,1.813,0,0,0,14.5,18.125Z" transform="translate(0 0)" fill="#fff"/>
-                      </g>
-                    </svg>
-                  </span>
-                  <p className="text-xs font-medium text-white">落札した商品を受け取るために必要な情報を入力してください</p>
-                </div>
+                <Caution cautionText="落札した商品を受け取るために必要な情報を入力してください"/>
               </div>
             </section>
             <section className="">
