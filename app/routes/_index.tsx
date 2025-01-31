@@ -32,6 +32,7 @@ export default function Index() {
   const [productsHistory,setProductsHistory] = useState<string[][]>([]);
 
   useEffect(() => {
+    // ローカルストレージから閲覧履歴を取得
     if (typeof window !== 'undefined') {
       const productsHistoryList:string|null = localStorage.getItem("productsHistory");
       if(productsHistoryList){
@@ -57,7 +58,7 @@ export default function Index() {
         <div className="">
           <ul className="grid grid-cols-3 gap-1">
             {data.map((item:products,index:number) => {
-              const aaa = item.product_thresholds.product_thresholds[0].threshold_price;
+              const aaa = item.product_thresholds[0].threshold_price;
               return (
 
               <li key={index} className="">

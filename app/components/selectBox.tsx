@@ -2,32 +2,13 @@ import React, { useEffect, useRef,useState } from 'react';
 import { debounce } from '~/hooks/functions';
 import { SetState } from '~/types/type';
 type props = {
-    visible:boolean;
-    setVisible:SetState<boolean>;
+    visible:number;
 }
 
-export default function selectBox({visible,setVisible}: props) {
+export default function selectBox({visible}: props) {
     //const ref = useRef<HTMLDivElement>(null);
     const [isOKEventListener, setIsOKEventListener] = useState<boolean>(false);
-    
-    const handleScroll = debounce(() => {
-        console.log(visible);
-        setVisible(false);
-        // if(visible){
-        //     console.log("GGG");
-        //     setVisible(false);
-        // }
-        }, 50); 
-        console.log(visible);
-    
 
-    useEffect(() => {
-        if(!isOKEventListener){
-            console.log("add2");
-            setIsOKEventListener(true);
-            window.addEventListener('scroll', handleScroll);
-        }
-    },[visible]);
 
     // useEffect(() => {
     //     function handleClickOutside(event: MouseEvent) {
@@ -44,7 +25,7 @@ export default function selectBox({visible,setVisible}: props) {
     //     };
     // }, [ref,]);
   return (
-    <aside className={`w-full h-full ${visible ? "block" : " pointer-events-none fade-out opacity-0"} popin-selectBox`}>
+    <aside className={`w-full h-full ${visible === 2 && "block"} ${visible === 1 && "pointer-events-none fade-out"} ${visible === 3 && "hidden"} opacity-0 popin-selectBox`}>
         <div className="relative w-full -top-3">
             <div className="absolute right-0 z-20 w-fit">
                 <div className="flex  gap-1 absolute top-6 -left-2 w-72 h-[112px] border-2 rounded-full border-[#AC0039] z-50 pointer-events-none">

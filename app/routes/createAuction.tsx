@@ -1,4 +1,5 @@
 import { useLoaderData } from "@remix-run/react";
+import { debounce } from '~/hooks/functions';
 import {Link} from "@remix-run/react";
 import type { LoaderFunction } from "@remix-run/node";
 import Header from "../components/header";
@@ -7,6 +8,7 @@ import Caution from "~/components/caution";
 import IconSvg from "../components/svgParts/importForm"
 import SelectBox from "../components/selectBox";
 import QAmodal from "~/components/QAmodal";
+import SelectItem from "~/components/selectItem";
 import Tag  from "~/components/tag";
 import { formatNumberWithCommas } from "~/hooks/functions";
 import { useState,useEffect } from "react";
@@ -15,10 +17,10 @@ import { products } from "../types/type";
 // export const loader: LoaderFunction = async ({ params }) => {
 //   const { itemNumber } = params;
 
-//   const response = await fetch("http://localhost:1234/api/v1/production/getDetail",{ 
-//     method: 'POST', 
+//   const response = await fetch("http://localhost:1234/api/v1/production/getDetail",{
+//     method: 'POST',
 //     headers: {
-//       'Content-Type': 'application/json',  
+//       'Content-Type': 'application/json',
 //     },
 //     body: JSON.stringify(
 //       {
@@ -34,10 +36,48 @@ import { products } from "../types/type";
 export default function ItemForm() {
     //const product:products = useLoaderData<typeof loader>();
     const [clickedList,setClickedList] = useState<boolean[]>([false,false,false,false,false,false,false]);
-    const [mediaUploadPre, setMediaUploadPre] = useState<boolean>(false)
+    const [clickCategoryList,setClickCategoryList] = useState<number[]>([-1,-1,-1]);
+    const [selectedCategory,setSelectedCategory] = useState<number[][]>([[]]);
+    //const [mediaUploadPre, setMediaUploadPre] = useState<boolean|null>(null)
     const [thresholds,setThresholds] = useState<string[][]>([[]]);
     const [thresholdsModal,setThresholdsModal] = useState<(boolean|null)[]>(thresholds.map(() => null));
-    const [QAmodalvisible,setQAmodalvisible] = useState<boolean|null>(null);
+    //const [QAmodalvisible,setQAmodalvisible] = useState<boolean|null>(null);
+    //1が非表示,2が表示,3が触れていない状態
+    const [visibleList,setVisibleList] = useState<(number)[][]>([[3],[3],[3]]);
+    const [isOKEventListener, setIsOKEventListener] = useState<boolean>(false);
+    console.log("レンダリング！");
+
+
+    const clickVisibleListState = (arrayIndex:number,index:number) => {
+        setVisibleList(prevState => {
+            const newState = [...prevState];
+            switch(newState[arrayIndex][index]){
+                case 1:
+                    newState[arrayIndex][index] = 2;
+                    break;
+                case 2:
+                    newState[arrayIndex][index] = 1;
+                    break;
+                case 3:
+                    //newState[arrayIndex] = newState[arrayIndex].map(() => 1);
+                    newState[arrayIndex][index] = 2;
+                    break;
+                default:
+                    break;
+            }
+            // if(newState[arrayIndex][index] !== 1){
+            //     newState[arrayIndex][index] = 1;
+            //     console.log("GGG");
+            // }
+            // else{
+            //     newState[arrayIndex][index] = 2;
+            //     console.log("LLL");
+            // }
+            //newState[arrayIndex][index] = !newState[arrayIndex][index];
+            console.log(newState);
+            return newState;
+        });
+    }
 
     const clickListState = (index:number) => {
         setClickedList(prevState => {
@@ -49,7 +89,6 @@ export default function ItemForm() {
     const inputThresholdsText = (text:string, arrayIndex:number, index:number) => {
         if(index === 0 && text.length > 15 || index === 0 && text.match(/[^0-9]+/)){
             setThresholds(prevState => {
-                console.log(prevState);
                 return prevState;
             });
         }
@@ -62,32 +101,45 @@ export default function ItemForm() {
         }
     };
     //モーダル類
-    const onDeleteModalArray = (index:number) => {
-        setThresholdsModal(prevState => {
-            const newState = [...prevState];
-            newState[index] = true;
-            return newState;
-        });
-    }
-    const offDeleteModalArray = (index:number) => {
-        setThresholdsModal(prevState => {
-            const newState = [...prevState];
-            newState[index] = false;
-            return newState;
-        });
-    };
-    const onQAmodal = () => {
-        setQAmodalvisible(true);
-    };
-    const offQAmodal = () => {
-        setQAmodalvisible(false);
-    };
+    // const onDeleteModalArray = (index:number) => {
+    //     setThresholdsModal(prevState => {
+    //         const newState = [...prevState];
+    //         newState[index] = true;
+    //         return newState;
+    //     });
+    // }
+    // const offDeleteModalArray = (index:number) => {
+    //     setThresholdsModal(prevState => {
+    //         const newState = [...prevState];
+    //         newState[index] = false;
+    //         return newState;
+    //     });
+    // };
+    // const onQAmodal = () => {
+    //     setQAmodalvisible(true);
+    // };
+    // const offQAmodal = () => {
+    //     setQAmodalvisible(false);
+    // };
 
     const deleteArray = (index:number) => {
         setThresholds(prevState => prevState.filter((_, i) => i !== index));
         setThresholdsModal(prevState => prevState.filter((_, i) => i !== index));
     };
-    const addArray = () => {
+    const openSelectorCategory = () => {
+        // const vvv = [...selectedCategory]
+        // const length = vvv.length-1;
+        // vvv[length] = [-1];
+        // console.log(vvv);
+        setSelectedCategory(prevState => {
+            const newState = [...prevState];
+            const length = newState.length;
+            newState[length] = [-1];
+            console.log(newState);
+            return newState;
+        })
+    }
+    const addThresholds = () => {
         setThresholds(prevState => {
             const newState = [...prevState];
             newState.push([]);
@@ -99,7 +151,25 @@ export default function ItemForm() {
             return newState;
         });
     };
-    console.log(thresholds);
+
+        // const handleScroll = debounce(() => {
+        //     console.log(visibleList)
+        //     // if(visibleList.includes(true)){
+        //     //     console.log("GGG");
+        //     //     //setVisibleList(visibleList.map(() => false));
+        //     // }
+        //     setVisibleList(visibleList.map((item) => item.map((subItem) => subItem === 3 ? 3 : 1)));
+        //     console.log(visibleList.map((item) => item.map((subItem) => subItem === null ? null : false)))
+        //     }, 50);
+
+
+        useEffect(() => {
+            if(!isOKEventListener){
+                console.log("add2");
+                setIsOKEventListener(true);
+                // window.addEventListener('scroll', handleScroll);
+            }
+        },[isOKEventListener]);
 
   return (
     <div className="w-full flex justify-center items-center">
@@ -109,7 +179,7 @@ export default function ItemForm() {
             <section className="flex flex-col gap-4">
                 <Caution cautionText="オークション作成に必要な情報を記入してください" />
                 <div className="">
-                    <ul onClick={() => {setMediaUploadPre(!mediaUploadPre)}} className="flex justify-start items-center gap-4 h-16 overflow-hidden">
+                    <ul onClick={() => {clickVisibleListState(0,0)}} className="flex justify-start items-center gap-4 h-16 overflow-hidden">
                         <li className="h-full flex flex-col justify-center items-center aspect-[1/1] bg-[#FF0054] rounded-3xl">
                             <svg xmlns="http://www.w3.org/2000/svg" width="19.218" height="19.217" viewBox="0 0 19.218 19.217">
                                 <g id="camera" transform="translate(1 1)">
@@ -126,7 +196,7 @@ export default function ItemForm() {
                         <li className="h-full aspect-[1/1] bg-[#CCCCCC] rounded-3xl"></li>
                         <li className="h-full aspect-[1/1] bg-[#CCCCCC] rounded-3xl"></li>
                     </ul>
-                    <SelectBox visible={mediaUploadPre} setVisible={setMediaUploadPre}/>
+                    <SelectBox visible={visibleList[0][0]}/>
                 </div>
             </section>
             <section className="">
@@ -135,20 +205,26 @@ export default function ItemForm() {
                         <label htmlFor="productTitle" className="block font-bold text-xs">商品名</label>
                         <input type="text" name="productTitle" placeholder="商品名" className="w-full border-[1px] border-[#FF0054] rounded p-2 bg-[#FFF8EE]" />
                     </li>
-                    <li className="flex flex-col gap-2">
+                    <li className="flex flex-col gap-2 relative">
                         <label htmlFor="productTitle" className="block font-bold text-xs">商品カテゴリ</label>
-                        <div className="group flex justify-center items-center gap-2 w-full border-[1px] border-[#FF0054] rounded p-2 bg-[#FFF8EE] transition-all hover:bg-[#FF0054] hover:text-white" >
-                            <span className="flex justify-center items-center">
-                                <svg className="fill-[#FF0054] group-hover:fill-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                    <g id="plus" transform="translate(-1.5 -1.5)">
-                                        <path id="パス_223" data-name="パス 223" d="M9.5,1.5a8,8,0,1,0,8,8A8,8,0,0,0,9.5,1.5Zm3.969,8.736H10.235V13.47a.735.735,0,1,1-1.47,0V10.235H5.531a.734.734,0,1,1,0-1.467H8.765V5.532a.735.735,0,1,1,1.47,0V8.767h3.234a.735.735,0,1,1,0,1.469Z"  fill-rule="evenodd"/>
-                                    </g>
-                                </svg>
-                            </span>
-                            <p className="font-medium text-xs">
-                                選択してください
-                            </p>
-                        </div>
+                        <div onClick={() => {openSelectorCategory()}}
+                             className="group flex justify-center items-center gap-2 w-full border-[1px] border-[#FF0054] rounded p-2 bg-[#FFF8EE] transition-all hover:bg-[#FF0054] hover:text-white" >
+                                <span className="flex justify-center items-center">
+                                    <svg className="fill-[#FF0054] group-hover:fill-white" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                        <g id="plus" transform="translate(-1.5 -1.5)">
+                                            <path id="パス_223" data-name="パス 223" d="M9.5,1.5a8,8,0,1,0,8,8A8,8,0,0,0,9.5,1.5Zm3.969,8.736H10.235V13.47a.735.735,0,1,1-1.47,0V10.235H5.531a.734.734,0,1,1,0-1.467H8.765V5.532a.735.735,0,1,1,1.47,0V8.767h3.234a.735.735,0,1,1,0,1.469Z"  fill-rule="evenodd"/>
+                                        </g>
+                                    </svg>
+                                </span>
+                                <p className="font-medium text-xs">
+                                    選択してください
+                                </p>
+                            </div>
+                        {selectedCategory.map((item,index) => (
+                            <>
+                            <SelectItem thisIndex={index} setSelectedCategory={setSelectedCategory} selectedCategory={selectedCategory} checkOpenNum={selectedCategory[index][0]} className="absolute top-0 right-2" option={["映画","qqq","チケット","ggg","eee","fff","ggg","hhh"]} optionChild={[["ロッキー","ウルフオブウォールストリート","マトリックス"],["aaa","bbb","ccc"],["ddd","eee","fff"],["ggg","hhh","iii","jjj"],["kkk","lll","mmm","ooo","ppp"],["qqq","rrr"],["sss","ttt","uuu"],["www"]]} />
+                            </>
+                        ))}
                     </li>
                     <li className="flex flex-col gap-2">
                         <label htmlFor="productTitle" className="block font-bold text-xs">商品名</label>
@@ -158,7 +234,7 @@ export default function ItemForm() {
             </section>
             <section className="flex flex-col gap-4">
                 <Caution cautionText="商品及び、特典を受け取るために必要な情報を選択してください" />
-                <div onClick={() => {QAmodalvisible ? offQAmodal() : onQAmodal()}} className="">
+                <div onClick={() => {clickVisibleListState(1,0)}} className="">
                     <div className="group flex cursor-pointer justify-end gap-1 w-full items-center ">
                         <span className="w-3 h-3 flex justify-center items-center">
                             <svg className="group-hover:fill-[#4ACDB8] fill-[#FF0054] w-full h-full transition-colors" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
@@ -169,7 +245,7 @@ export default function ItemForm() {
                         </span>
                         <p className="text-[10px] group-hover:text-[#4ACDB8] transition-colors">商品及び、特典を受け取るために必要な情報とは？</p>
                     </div>
-                    <QAmodal className={`${QAmodalvisible === true && "popin-selectBox"} ${QAmodalvisible===null && "hidden"} ${QAmodalvisible === false && "fade-out opacity-0 pointer-events-none"} `} questionTitle="商品及び、特典を受け取るために必要な情報とは？" questionText={["落札者が商品及び特典を受け取るにあたって、出品者に提供しなければならない情報を指します。","住所や電話番号、出品者の運営するサロンの会員番号などなんでもOKです:)"]} questionImage="https://elements-resized.envatousercontent.com/elements-video-cover-images/d52da14a-a65e-46bf-8fc9-677acb58a4e3/video_preview/video_preview_0000.jpg?w=500&cf_fit=cover&q=85&format=auto&s=e9e16f784a16f995c39a9b96c0e2b635647e15dd4778b91673a64be3a200f2ef" />
+                    <QAmodal className={`${visibleList[1][0]=== 3 ? "hidden" : visibleList[1][0]=== 2 ? "popin-selectBox" : "fade-out opacity-0 pointer-events-none"} `} questionTitle="商品及び、特典を受け取るために必要な情報とは？" questionText={["落札者が商品及び特典を受け取るにあたって、出品者に提供しなければならない情報を指します。","住所や電話番号、出品者の運営するサロンの会員番号などなんでもOKです:)"]} questionImage="https://elements-resized.envatousercontent.com/elements-video-cover-images/d52da14a-a65e-46bf-8fc9-677acb58a4e3/video_preview/video_preview_0000.jpg?w=500&cf_fit=cover&q=85&format=auto&s=e9e16f784a16f995c39a9b96c0e2b635647e15dd4778b91673a64be3a200f2ef" />
                 </div>
                 <ul className="grid grid-cols-3 grid-rows-[auto] gap-2">
                     <li onClick={() => {clickListState(0)}} className={`group w-full h-auto flex flex-col items-center gap-1 border-[1px] border-[#FF0054] rounded-lg p-3 transition-colors hover:bg-[#FF0054] hover:text-white ${clickedList[0] ? "bg-[#FF0054] text-white" : ""}`}>
@@ -253,7 +329,7 @@ export default function ItemForm() {
                 <ul className="relative -top-48 -mb-48 flex flex-col w-full gap-4 pl-9">
                     {thresholds.map((item,index) => {
                         return(
-                            <li className="fade-in relative overflow-hidden">
+                            <li key={index} className="fade-in relative overflow-hidden">
                                 <ul className="flex flex-col gap-3 w-full pt-6 pr-6 pb-10 pl-6 border-[1px] border-[#FACFC5] bg-[#FFE9D9] rounded shadow-custom">
                                     <li className="flex flex-col gap-2 z-10">
                                         <label htmlFor="" className="block font-bold text-xs">落札額</label>
@@ -286,7 +362,7 @@ export default function ItemForm() {
                                             画像を追加する
                                         </button>
                                     </li>
-                                    <li onClick={() => onDeleteModalArray(index)} className="w-full z-10">
+                                    <li onClick={() => (clickVisibleListState(2,index))} className="w-full z-10">
                                         <button className="group w-full flex justify-center items-center gap-2 rounded p-2 text-xs bg-[#4B0019] hover:bg-[#FF0054] text-white hover:text-white transition-colors">
                                             <span className=" flex justify-center items-center w-4 h-4">
                                                 <svg className="fill-white w-full h-full" xmlns="http://www.w3.org/2000/svg" width="13.5" height="16.75" viewBox="0 0 13.5 16.75">
@@ -301,7 +377,7 @@ export default function ItemForm() {
                                         </button>
                                     </li>
                                 </ul>
-                                <aside className= {`text-white text-xs pl-9 absolute top-1/2 translate-y-[-50%] z-20 ${thresholdsModal[index] && "slide-in "} ${!thresholdsModal[index] && "slide-out translate-x-full"} ${thresholdsModal[index]===null && "hidden"}`}>
+                                <aside className= {`text-white text-xs pl-9 absolute top-1/2 translate-y-[-50%] z-20 ${visibleList[2][index] == 2 && "slide-in "} ${visibleList[2][index] == 1 && "slide-out translate-x-full"} ${visibleList[2][index]===3 && "hidden"}`}>
                                     <div className="flex flex-col gap-3 pt-6 pr-3 pb-6 pl-9 bg-[#FF0054] rounded-l-full">
                                         <div className="flex gap-2">
                                             <span className="w-4 h-4 flex items-center">
@@ -319,10 +395,11 @@ export default function ItemForm() {
                                             この落札特典を削除してもよろしいでしょうか？
                                         </p>
                                         <div className="flex gap-3">
-                                            <button onClick={()=>{deleteArray(index)}} className="w-full bg-white rounded-full text-[#FF0054] font-bold pt-1 pb-1">
+                                            <button  className="w-full bg-white rounded-full text-[#FF0054] font-bold pt-1 pb-1">
                                                 削除する
                                             </button>
-                                            <button onClick={()=>{offDeleteModalArray(index)}} className="w-full bg-[#FF0054] rounded-full text-white font-bold pt-1 pb-1">
+                                            <button onClick={()=>{
+                                                clickVisibleListState(2,index)}} className="w-full bg-[#FF0054] rounded-full text-white font-bold pt-1 pb-1">
                                                 キャンセル
                                             </button>
                                         </div>
@@ -332,7 +409,7 @@ export default function ItemForm() {
                         );
                     })}
                     <li className="">
-                        <button className="group w-full flex justify-center items-center gap-2 border-[1px] border-[#FF0054] rounded p-2 bg-[#FFF8EE] text-xs hover:bg-[#FF0054] hover:text-white transition-colors" onClick={addArray}>
+                        <button className="group w-full flex justify-center items-center gap-2 border-[1px] border-[#FF0054] rounded p-2 bg-[#FFF8EE] text-xs hover:bg-[#FF0054] hover:text-white transition-colors" onClick={addThresholds}>
                             <span className=" flex justify-center items-center w-4 h-4">
                                 <svg className="fill-[#FF0054] group-hover:fill-white w-full h-full" id="plus" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                                     <path id="パス_223" data-name="パス 223" d="M9.5,1.5a8,8,0,1,0,8,8A8,8,0,0,0,9.5,1.5Zm3.969,8.736H10.235V13.47a.735.735,0,1,1-1.47,0V10.235H5.531a.734.734,0,1,1,0-1.467H8.765V5.532a.735.735,0,1,1,1.47,0V8.767h3.234a.735.735,0,1,1,0,1.469Z" transform="translate(-1.5 -1.5)" fill-rule="evenodd"/>

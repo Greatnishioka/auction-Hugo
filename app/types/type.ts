@@ -10,7 +10,7 @@ export type products = {
     product_openprice:number, 
     product_tags:tags, 
     product_text:product_text, 
-    product_thresholds:thresholds,
+    product_thresholds:threshold[],
     product_sold_status:number,
     created_at:Date,
 };
@@ -22,9 +22,6 @@ type tags = {
 type product_text = {
     product_text:string[],
 }
-type thresholds = {
-    product_thresholds: threshold[]; // threshold配列を保持
-};
 
 type threshold = {
     

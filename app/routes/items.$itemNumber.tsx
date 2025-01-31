@@ -137,7 +137,7 @@ export default function ProductPage() {
                 <span className="text-xs text-white font-medium">落札特典</span>
               </div> */}
               <ul className="flex flex-col gap-16">
-                {product.product_thresholds.product_thresholds.map((item,index) => {
+                {product.product_thresholds.map((item,index) => {
                   return(
                   
                   <li key={index} className="flex flex-col gap-0">
