@@ -15,3 +15,6 @@
 ## 5. npm run start
 もし開発モードとして実行する場合はnpm run devを使用してね！😌
 [![Image from Gyazo](https://i.gyazo.com/1b00dbbd5b9f2d887bf18db48dd49702.png)](https://gyazo.com/1b00dbbd5b9f2d887bf18db48dd49702)
+
+## SVG置き換え<br>
+***最終的にはSVGを全て権利的に問題のないものに変更***

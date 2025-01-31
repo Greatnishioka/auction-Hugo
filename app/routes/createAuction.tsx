@@ -127,17 +127,15 @@ export default function ItemForm() {
         setThresholdsModal(prevState => prevState.filter((_, i) => i !== index));
     };
     const openSelectorCategory = () => {
-        // const vvv = [...selectedCategory]
-        // const length = vvv.length-1;
-        // vvv[length] = [-1];
-        // console.log(vvv);
-        setSelectedCategory(prevState => {
-            const newState = [...prevState];
-            const length = newState.length;
-            newState[length] = [-1];
-            console.log(newState);
-            return newState;
-        })
+
+        const newState = [...selectedCategory];
+        if (newState.some(item =>item.length == 1 || item[0] === -1)) {
+            return;
+        }
+        const length = newState[0].length === 0 ? newState.length - 1 : newState.length;
+        newState[length] = [-1];
+
+        setSelectedCategory(newState);
     }
     const addThresholds = () => {
         setThresholds(prevState => {
