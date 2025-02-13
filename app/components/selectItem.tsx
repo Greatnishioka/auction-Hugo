@@ -8,26 +8,32 @@ type props = {
     selectedCategory:number[][];
     checkOpenNum:number;
     setSelectedCategory:SetState<number[][]>;
+    setVisibleList:SetState<number[][]>;
 }
 
-export default function SelectItem({thisIndex,option,className,optionChild,selectedCategory,checkOpenNum,setSelectedCategory}: props) {
+export default function SelectItem({thisIndex,option,className,optionChild,selectedCategory,checkOpenNum,setSelectedCategory,setVisibleList}: props) {
 
     const clickCategory = (arrayIndex:number,arrayIndex2:number,index:number) => {
         
         const newArray = [...selectedCategory];
         newArray[arrayIndex][arrayIndex2] = index;
-        console.log(newArray);
         setSelectedCategory(newArray);
 
         if(arrayIndex2 === 1){
-            //setSelectedCategory(newArray);
+            setVisibleList(prevState => {
+                const newState = [...prevState];
+                newState[1][0] = 1;
+                return newState;
+            });
         }
     }
 
+    console.log(thisIndex);
+
     return (
-        <aside className={`${checkOpenNum === undefined ? "hidden" : checkOpenNum !== -1 && ""}  popin-selectBox  relative w-full h-full -top-16 left-0 z-10`}>
-            <div className={`${className} w-[173px]` }>
-                <ul className="absolute flex flex-col justify-center items-center w-36 border-[1px] border-[#FF0054] bg-[#FFF8EE] rounded-2xl z-10">
+        <aside className={`popin-selectBox relative w-full h-full -top-16 left-0 z-10`}>
+            <div className={`w-[173px] ${className}` }>
+                <ul className={` absolute flex flex-col justify-center items-center w-36 border-[1px] border-[#FF0054] bg-[#FFF8EE] rounded-2xl z-10`}>
                     {option.map((item,index) => {
                         const randomX = Math.floor(Math.random() * 79);
                     return( 
@@ -55,9 +61,7 @@ export default function SelectItem({thisIndex,option,className,optionChild,selec
                 <div className="absolute -top-4 w-fit z-0">
                     <img src={BgDeco} alt="" className="" />
                 </div>
-                <div className="absolute -top-4 w-full h-full z-20 bg-[#00000048]">
-                </div>
-                {selectedCategory[thisIndex][0] !== -1 &&
+                {selectedCategory[thisIndex][0] !== undefined && selectedCategory[thisIndex][0] !== -1 &&
                 <>
                     <ul className="absolute top-24 -left-32 flex flex-col justify-center items-center w-36 border-[1px] border-[#FF0054] bg-[#FFF8EE] rounded-2xl z-10 popin-selectBox">
                     {selectedCategory[thisIndex][0] !== -1 && selectedCategory[thisIndex][0] !== undefined && optionChild[selectedCategory[thisIndex][0]].map((item,index) => {
